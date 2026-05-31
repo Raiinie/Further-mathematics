@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CIE FP2 · Hyperbolic Functions</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --bg-card: #12121a;
+  --bg-card-hover: #1a1a26;
+  --border: #2a2a3a;
+  --text: #e8e6e3;
+  --text-dim: #8a8a9a;
+  --text-bright: #ffffff;
+  --accent: #64b5f6;
+  --accent-dim: #2a4a6a;
+  --green: #81c784;
+  --green-dim: #1a3a2a;
+  --orange: #ffb74d;
+  --orange-dim: #3a2a1a;
+  --red: #ef5350;
+  --red-dim: #3a1a1a;
+  --purple: #b39ddb;
+  --purple-dim: #2a1a3a;
+  --pink: #f48fb1;
+  --pink-dim: #3a1a2a;
+  --yellow: #fff176;
+  --yellow-dim: #3a3a1a;
+  --teal: #4db6ac;
+  --teal-dim: #1a2a2a;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ===== HERO ===== */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 40px;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -200px; right: -200px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(100,181,246,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -100px; left: -100px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(179,157,219,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 24px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease forwards 0.2s;
+}
+
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(48px, 8vw, 96px);
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--text-bright);
+  margin-bottom: 24px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease forwards 0.4s;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.hero-sub {
+  font-size: 20px;
+  color: var(--text-dim);
+  max-width: 600px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease forwards 0.6s;
+}
+
+.hero-formula {
+  margin-top: 48px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: var(--text-dim);
+  opacity: 0;
+  animation: fadeUp 0.8s ease forwards 0.8s;
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.hero-formula span {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.02);
+}
+
+/* ===== NAV ===== */
+.side-nav {
+  position: fixed;
+  top: 50%;
+  right: 24px;
+  transform: translateY(-50%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.side-nav a {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: all 0.3s;
+  position: relative;
+}
+
+.side-nav a.active,
+.side-nav a:hover {
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(100,181,246,0.4);
+}
+
+.side-nav a::after {
+  content: attr(data-label);
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-dim);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.side-nav a:hover::after { opacity: 1; }
+
+/* ===== SECTIONS ===== */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 40px 120px;
+}
+
+section {
+  margin-bottom: 100px;
+  scroll-margin-top: 40px;
+}
+
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 32px;
+  line-height: 1.2;
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px;
+  margin-bottom: 20px;
+  transition: border-color 0.3s, background 0.3s;
+}
+
+.card:hover {
+  border-color: rgba(100,181,246,0.3);
+  background: var(--bg-card-hover);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.card-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.card-title {
+  font-family: 'Source Sans 3', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text-bright);
+}
+
+/* Color variants */
+.accent-blue .card-icon { background: var(--accent-dim); color: var(--accent); }
+.accent-green .card-icon { background: var(--green-dim); color: var(--green); }
+.accent-orange .card-icon { background: var(--orange-dim); color: var(--orange); }
+.accent-red .card-icon { background: var(--red-dim); color: var(--red); }
+.accent-purple .card-icon { background: var(--purple-dim); color: var(--purple); }
+.accent-pink .card-icon { background: var(--pink-dim); color: var(--pink); }
+.accent-yellow .card-icon { background: var(--yellow-dim); color: var(--yellow); }
+.accent-teal .card-icon { background: var(--teal-dim); color: var(--teal); }
+
+/* ===== FORMULA BOX ===== */
+.formula-box {
+  background: rgba(100,181,246,0.04);
+  border: 1px solid rgba(100,181,246,0.15);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  padding: 24px 28px;
+  margin: 16px 0;
+  overflow-x: auto;
+}
+
+.formula-box .katex { font-size: 1.15em; }
+
+.formula-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 8px 0;
+  flex-wrap: wrap;
+}
+
+.formula-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--accent);
+  min-width: 80px;
+}
+
+/* ===== TABLE ===== */
+.prop-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+}
+
+.prop-table th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.prop-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(42,42,58,0.5);
+  vertical-align: top;
+}
+
+.prop-table tr:hover td {
+  background: rgba(255,255,255,0.02);
+}
+
+/* ===== EXAMPLE ===== */
+.example {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin: 20px 0;
+  overflow: hidden;
+}
+
+.example-header {
+  padding: 16px 28px;
+  background: rgba(100,181,246,0.06);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.example-header:hover {
+  background: rgba(100,181,246,0.1);
+}
+
+.example-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.example-q {
+  font-size: 16px;
+  color: var(--text-bright);
+  flex: 1;
+  margin-left: 16px;
+}
+
+.example-toggle {
+  font-size: 20px;
+  color: var(--text-dim);
+  transition: transform 0.3s;
+}
+
+.example-body {
+  padding: 0 28px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, padding 0.3s;
+}
+
+.example.open .example-body {
+  max-height: 3000px;
+  padding: 24px 28px;
+}
+
+.example.open .example-toggle {
+  transform: rotate(45deg);
+}
+
+.step {
+  margin: 12px 0;
+  padding-left: 20px;
+  border-left: 2px solid var(--border);
+}
+
+.step-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+/* ===== INSIGHT BOX ===== */
+.insight {
+  background: rgba(179,157,219,0.06);
+  border: 1px solid rgba(179,157,219,0.2);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin: 20px 0;
+  position: relative;
+}
+
+.insight::before {
+  content: '💡';
+  position: absolute;
+  top: -12px;
+  left: 20px;
+  background: var(--bg);
+  padding: 0 8px;
+  font-size: 18px;
+}
+
+.insight-title {
+  font-weight: 700;
+  color: var(--purple);
+  margin-bottom: 8px;
+}
+
+/* ===== WARNING BOX ===== */
+.warning {
+  background: rgba(239,83,80,0.06);
+  border: 1px solid rgba(239,83,80,0.2);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin: 20px 0;
+  position: relative;
+}
+
+.warning::before {
+  content: '⚠️';
+  position: absolute;
+  top: -12px;
+  left: 20px;
+  background: var(--bg);
+  padding: 0 8px;
+  font-size: 18px;
+}
+
+.warning-title {
+  font-weight: 700;
+  color: var(--red);
+  margin-bottom: 8px;
+}
+
+/* ===== TIP BOX ===== */
+.tip {
+  background: rgba(129,199,132,0.06);
+  border: 1px solid rgba(129,199,132,0.2);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin: 20px 0;
+  position: relative;
+}
+
+.tip::before {
+  content: '✦';
+  position: absolute;
+  top: -12px;
+  left: 20px;
+  background: var(--bg);
+  padding: 0 8px;
+  font-size: 18px;
+  color: var(--green);
+}
+
+.tip-title {
+  font-weight: 700;
+  color: var(--green);
+  margin-bottom: 8px;
+}
+
+/* ===== TAGS ===== */
+.tag {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  margin: 2px 4px 2px 0;
+}
+
+.tag-freq { background: var(--green-dim); color: var(--green); }
+.tag-rare { background: var(--orange-dim); color: var(--orange); }
+.tag-trap { background: var(--red-dim); color: var(--red); }
+.tag-proof { background: var(--purple-dim); color: var(--purple); }
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .hero { padding: 40px 24px; }
+  .container { padding: 0 20px 80px; }
+  .side-nav { display: none; }
+  .hero-formula { flex-direction: column; gap: 12px; }
+  .formula-row { flex-direction: column; gap: 4px; }
+  .card { padding: 24px; }
+  .section-title { font-size: 28px; }
+}
+
+/* ===== GRAPH CANVAS ===== */
+.graph-container {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  margin: 16px 0;
+  text-align: center;
+}
+
+.graph-container canvas {
+  max-width: 100%;
+}
+
+/* ===== BACK TO TOP ===== */
+.back-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 18px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-top.show { opacity: 1; }
+.back-top:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border), transparent);
+  margin: 60px 0;
+}
+</style>
+</head>
+<body>
+
+<!-- ===== SIDE NAV ===== -->
+<nav class="side-nav">
+  <a href="#definitions" data-label="定义"></a>
+  <a href="#graphs" data-label="图像"></a>
+  <a href="#identities" data-label="恒等式"></a>
+  <a href="#equations" data-label="解方程"></a>
+  <a href="#inverse" data-label="反函数"></a>
+  <a href="#exam-focus" data-label="考点"></a>
+  <a href="#traps" data-label="易错点"></a>
+  <a href="#deeper" data-label="深度洞察"></a>
+</nav>
+
+<!-- ===== HERO ===== -->
+<header class="hero">
+  <div class="hero-label">CIE Further Pure Mathematics 2 · Chapter 19</div>
+  <h1>Hyperbolic<br><em>Functions</em></h1>
+  <p class="hero-sub">双曲函数完整复习 — 从定义到反函数，从恒等式到解方程，覆盖所有考点与易错点。</p>
+  <div class="hero-formula">
+    <span>$$\sinh x = \frac{e^x - e^{-x}}{2}$$</span>
+    <span>$$\cosh x = \frac{e^x + e^{-x}}{2}$$</span>
+    <span>$$\tanh x = \frac{e^x - e^{-x}}{e^x + e^{-x}}$$</span>
+  </div>
+</header>
+
+<div class="container">
+
+<!-- ============================================================ -->
+<!-- SECTION 1: DEFINITIONS -->
+<!-- ============================================================ -->
+<section id="definitions" class="reveal">
+  <div class="section-label">01 · Definitions</div>
+  <div class="section-title">定义与指数形式</div>
+
+  <p style="margin-bottom:24px;">双曲函数来源于单位双曲线 \(x^2 - y^2 = 1\)，与三角函数来源于单位圆 \(x^2 + y^2 = 1\) 相对应。所有双曲函数都用 \(e^x\) 来定义。</p>
+
+  <div class="card accent-blue">
+    <div class="card-header">
+      <div class="card-icon">P</div>
+      <div class="card-title">Primary Functions 主要函数</div>
+    </div>
+    <div class="formula-box">
+      <div class="formula-row">
+        <span class="formula-label">sinh x</span>
+        <span>$$\sinh x = \frac{e^x - e^{-x}}{2}$$</span>
+      </div>
+      <div class="formula-row">
+        <span class="formula-label">cosh x</span>
+        <span>$$\cosh x = \frac{e^x + e^{-x}}{2}$$</span>
+      </div>
+      <div class="formula-row">
+        <span class="formula-label">tanh x</span>
+        <span>$$\tanh x = \frac{\sinh x}{\cosh x} = \frac{e^x - e^{-x}}{e^x + e^{-x}}$$</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card accent-teal">
+    <div class="card-header">
+      <div class="card-icon">R</div>
+      <div class="card-title">Reciprocal Functions 倒数函数</div>
+    </div>
+    <div class="formula-box">
+      <div class="formula-row">
+        <span class="formula-label">cosech x</span>
+        <span>$$\operatorname{cosech} x = \frac{1}{\sinh x} = \frac{2}{e^x - e^{-x}}$$</span>
+      </div>
+      <div class="formula-row">
+        <span class="formula-label">sech x</span>
+        <span>$$\operatorname{sech} x = \frac{1}{\cosh x} = \frac{2}{e^x + e^{-x}}$$</span>
+      </div>
+      <div class="formula-row">
+        <span class="formula-label">coth x</span>
+        <span>$$\operatorname{coth} x = \frac{\cosh x}{\sinh x} = \frac{e^x + e^{-x}}{e^x - e^{-x}}$$</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <div class="tip-title">关键关系式</div>
+    <p>$$e^x = \cosh x + \sinh x \qquad e^{-x} = \cosh x - \sinh x$$</p>
+    <p style="margin-top:8px; color:var(--text-dim);">把 sinh 和 cosh 的定义直接相加/相减即可得到。这个关系在化简和证明中经常用到。</p>
+  </div>
+
+  <!-- Example 1.1 -->
+  <div class="example">
+    <div class="example-header" onclick="toggleExample(this)">
+      <span class="example-tag">Example 1.1</span>
+      <span class="example-q">求 \(\sinh(\ln 2)\) 和 \(\tanh(\ln 4)\) 的值</span>
+      <span class="example-toggle">+</span>
+    </div>
+    <div class="example-body">
+      <p><strong>(i) \(\sinh(\ln 2)\)：</strong></p>
+      <div class="step">
+        <div class="step-label">代入定义</div>
+        <p>$$\sinh(\ln 2) = \frac{e^{\ln 2} - e^{-\ln 2}}{2} = \frac{2 - \frac{1}{2}}{2} = \frac{\frac{3}{2}}{2} = \frac{3}{4}$$</p>
+      </div>
+      <p style="margin-top:20px;"><strong>(ii) \(\tanh(\ln 4)\)：</strong></p>
+      <div class="step">
+        <div class="step-label">代入定义</div>
+        <p>$$\tanh(\ln 4) = \frac{e^{\ln 4} - e^{-\ln 4}}{e^{\ln 4} + e^{-\ln 4}} = \frac{4 - \frac{1}{4}}{4 + \frac{1}{4}} = \frac{\frac{15}{4}}{\frac{17}{4}} = \frac{15}{17}$$</p>
+      </div>
+      <div class="insight" style="margin-top:20px;">
+        <div class="insight-title">技巧</div>
+        <p>遇到 \(e^{\ln a}\) 直接等于 \(a\)，而 \(e^{-\ln a} = \frac{1}{a}\)。这是此类题的核心简化。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 1.5 -->
+  <div class="example">
+    <div class="example-header" onclick="toggleExample(this)">
+      <span class="example-tag">Example 1.5</span>
+      <span class="example-q">若 \(\sinh x = \frac{3}{4}\)，求 sech x, tanh x, cosh 2x, tanh 2x</span>
+      <span class="example-toggle">+</span>
+    </div>
+    <div class="example-body">
+      <div class="step">
+        <div class="step-label">Step 1 · 求 cosh x</div>
+        <p>由 \(\cosh^2 x - \sinh^2 x = 1\)：</p>
+        <p>$$\cosh^2 x = 1 + \frac{9}{16} = \frac{25}{16} \implies \cosh x = \frac{5}{4}$$</p>
+        <p style="color:var(--red);">注意：\(\cosh x \geq 1\)，所以 \(\cosh x = -\frac{5}{4}\) 被 reject。</p>
+      </div>
+      <div class="step">
+        <div class="step-label">Step 2 · 求 sech x 和 tanh x</div>
+        <p>$$\operatorname{sech} x = \frac{1}{\cosh x} = \frac{4}{5}$$</p>
+        <p>$$\tanh x = \frac{\sinh x}{\cosh x} = \frac{3/4}{5/4} = \frac{3}{5}$$</p>
+      </div>
+      <div class="step">
+        <div class="step-label">Step 3 · 双角公式</div>
+        <p>$$\cosh 2x = \cosh^2 x + \sinh^2 x = \frac{25}{16} + \frac{9}{16} = \frac{34}{16} = \frac{17}{8}$$</p>
+        <p>$$\tanh 2x = \frac{2\tanh x}{1 + \tanh^2 x} = \frac{2 \times \frac{3}{5}}{1 + \frac{9}{25}} = \frac{\frac{6}{5}}{\frac{34}{25}} = \frac{6}{5} \times \frac{25}{34} = \frac{15}{17}$$</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 1.6 -->
+  <div class="example">
+    <div class="example-header" onclick="toggleExample(this)">
+      <span class="example-tag">Example 1.6</span>
+      <span class="example-q">若 \(\tanh x = \frac{5}{13}\)，求 cosech x, cosh x, sinh 2x, tanh 2x</span>
+      <span class="example-toggle">+</span>
+    </div>
+    <div class="example-body">
+      <div class="step">
+        <div class="step-label">Step 1 · 求 cosech x</div>
+        <p>由 \(\operatorname{coth}^2 x - 1 = \operatorname{cosech}^2 x\)，且 \(\operatorname{coth} x = \frac{13}{5}\)：</p>
+        <p>$$\operatorname{cosech}^2 x = \frac{169}{25} - 1 = \frac{144}{25} \implies \operatorname{cosech} x = \frac{12}{5}$$</p>
+      </div>
+      <div class="step">
+        <div class="step-label">Step 2 · 求 sinh x 和 cosh x</div>
+        <p>$$\sinh x = \frac{5}{12}, \quad \cosh x = \frac{13}{12}$$</p>
+        <p style="color:var(--red);">\(\cosh x = -\frac{13}{12}\) reject，因为 \(\cosh x \geq 1\)。</p>
+      </div>
+      <div class="step">
+        <div class="step-label">Step 3 · 双角公式</div>
+        <p>$$\sinh 2x = 2\sinh x \cosh x = 2 \times \frac{5}{12} \times \frac{13}{12} = \frac{65}{72}$$</p>
+        <p>$$\tanh 2x = \frac{2\tanh x}{1 + \tanh^2 x} = \frac{2 \times \frac{5}{13}}{1 + \frac{25}{169}} = \frac{\frac{10}{13}}{\frac{194}{169}} = \frac{65}{97}$$</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!-- SECTION 2: GRAPHS -->
+<!-- ============================================================ -->
+<section id="graphs" class="reveal">
+  <div class="section-label">02 · Graphs</div>
+  <div class="section-title">图像与性质</div>
+
+  <div class="card accent-blue">
+    <div class="card-header">
+      <div class="card-icon">📊</div>
+      <div class="card-title">六个双曲函数的性质总表</div>
+    </div>
+    <div style="overflow-x:auto;">
+    <table class="prop-table">
+      <thead>
+        <tr>
+          <th>函数</th>
+          <th>Domain</th>
+          <th>Range</th>
+          <th>奇/偶</th>
+          <th>渐近线</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>\(y = \sinh x\)</td>
+          <td>\(x \in \mathbb{R}\)</td>
+          <td>\(y \in \mathbb{R}\)</td>
+          <td>奇函数</td>
+          <td>无</td>
+        </tr>
+        <tr>
+          <td>\(y = \cosh x\)</td>
+          <td>\(x \in \mathbb{R}\)</td>
+          <td>\(y \geq 1\)</td>
+          <td>偶函数</td>
+          <td>无</td>
+        </tr>
+        <tr>
+          <td>\(y = \tanh x\)</td>
+          <td>\(x \in \mathbb{R}\)</td>
+          <td>\(-1 < y < 1\)</td>
+          <td>奇函数</td>
+          <td>\(y = \pm 1\)</td>
+        </tr>
+        <tr>
+          <td>\(y = \operatorname{cosech} x\)</td>
+          <td>\(x \neq 0\)</td>
+          <td>\(y \neq 0\)</td>
+          <td>奇函数</td>
+          <td>\(x = 0,\ y = 0\)</td>
+        </tr>
+        <tr>
+          <td>\(y = \operatorname{sech} x\)</td>
+          <td>\(x \in \mathbb{R}\)</td>
+          <td>\(0 < y \leq 1\)</td>
+          <td>偶函数</td>
+          <td>\(y = 0\)</td>
+        </tr>
+        <tr>
+          <td>\(y = \operatorname{coth} x\)</td>
+          <td>\(x \neq 0\)</td>
+          <td>\(y > 1\) 或 \(y < -1\)</td>
+          <td>奇函数</td>
+          <td>\(x = 0,\ y = \pm 1\)</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="warning">
+    <div class="warning-title">cosh x 不是一对一函数！</div>
+    <p>cosh x 是偶函数，图像关于 y 轴对称。要让它有反函数，必须限制定义域为 \(x \geq 0\)（或 \(x \leq 0\)）。这就是为什么 \(\cosh^{-1} x\) 只取正值。</p>
+  </div>
+
+  <div class="insight">
+    <div class="insight-title">如何记住图像</div>
+    <p><strong>sinh x</strong> 是 \(\frac{1}{2}e^x\) 和 \(-\frac{1}{2}e^{-x}\) 的"平均"，像被拉伸的 S 形。</p>
+    <p><strong>cosh x</strong> 是 \(\frac{1}{2}e^x\) 和 \(\frac{1}{2}e^{-x}\) 的"平均"，形成悬链线（catenary）— 悬挂链条的形状。</p>
+    <p><strong>tanh x</strong> 被两条水平渐近线 \(y = \pm 1\) 夹住，像一个被压扁的 S 形。</p>
+  </div>
+
+  <!-- Example 1.3: Graph sketching -->
+  <div class="example">
+    <div class="example-header" onclick="toggleExample(this)">
+      <span class="example-tag">Example 1.3</span>
+      <span class="example-q">画 \(y = |3\cosh(x+1) - 4|\) 的图像</span>
+      <span class="example-toggle">+</span>
+    </div>
+    <div class="example-body">
+      <p>设 \(f(x) = \cosh x\)，按变换顺序逐步画图：</p>
+      <div class="step">
+        <div class="step-label">Step 1 · 水平平移</div>
+        <p>\(y = f(x+1) = \cosh(x+1)\)：图像向左平移 1 个单位</p>
+      </div>
+      <div class="step">
+        <div class="step-label">Step 2 · 垂直拉伸</div>
+        <p>\(y = 3f(x+1) = 3\cosh(x+1)\)：图像在 y 方向拉伸 3 倍，最小值变为 3</p>
+      </div>
+      <div class="step">
+        <div class="step-label">Step 3 · 垂直平移</div>
+        <p>\(y = 3f(x+1) - 4 = 3\cosh(x+1) - 4\)：图像向下平移 4 个单位，最小值变为 \(3 - 4 = -1\)</p>
+      </div>
+      <div class="step">
+        <div class="step-label">Step 4 · 取绝对值</div>
+        <p>\(y = |3\cosh(x+1) - 4|\)：把 y 轴下方的部分翻折到上方。最小值处形成"V"形尖角。</p>
+      </div>
+      <div class="tip" style="margin-top:16px;">
+        <div class="tip-title">画图要标注的关键信息</div>
+        <p>最低点坐标、与坐标轴的交点、渐近线（如果有）、对称轴。考试要求标出这些。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!-- SECTION 3: IDENTITIES -->
+<!-- ============================================================ -->
+<section id="identities" class="reveal">
+  <div class="section-label">03 · Identities</div>
+  <div class="section-title">双曲恒等式</div>
+
+  <div class="card accent-purple">
+    <div class="card-header">
+      <div class="card-icon">≡</div>
+      <div class="card-title">三大核心恒等式</div>
+    </div>
+    <div class="formula-box">
+      <div class="formula-row">
+        <span>$$\cosh^2 x - \sinh^2 x \equiv 1$$</span>
+      </div>
+      <div class="formula-row">
+        <span>$$1 - \tanh^2 x \equiv \operatorname{sech}^2 x$$</span>
+      </div>
+      <div class="formula-row">
+        <span>$$\operatorname{coth}^2 x - 1 \equiv \operatorname{cosech}^2 x$$</span>
+      </div>
+    </div>
+    <p style="margin-top:12px; color:var(--text-dim);">第一个除以 \(\cosh^2 x\) 得第二个，除以 \(\sinh^2 x\) 得第三个。</p>
+  </div>
+
+  <div class="card accent-orange">
+    <div class="card-header">
+      <div class="card-icon">2x</div>
+      <div class="card-title">双角公式</div>
+    </div>
+    <div class="formula-box">
+      <div class="formula-row">
+        <span>$$\sinh 2x = 2\sinh x \cosh x$$</span>
+      </div>
+      <div class="formula-row">
+        <span>$$\cosh 2x = \cosh^2 x + \sinh^2 x = 2\cosh^2 x - 1 = 1 + 2\sinh^2 x$$</span>
+      </div>
+      <div class="formula-row">
+        <span>$$\tanh 2x = \frac{2\tanh x}{1 + \tanh^2 x}$$</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card accent-pink">
+    <div class="card-header">
+      <div class="card-icon">+</div>
+      <div class="card-title">加法公式 (Addition Formulae)</div>
+    </div>
+    <div class="formula-box">
+      <div class="formula-row">
+        <span>$$\sinh(A + B) \equiv \sinh A \cosh B + \cosh A \sinh B$$</span>
+      </div>
+      <div class="formula-row">
+        <span>$$\cosh(A + B) \equiv \cosh A \cosh B + \sinh A \sinh B$$</span>
+      </div>
+      <div class="formula-row">
+        <span>$$\tanh(A + B) \equiv \frac{\tanh A + \tanh B}{1 + \tanh A \tanh B}$$</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Osborne's Rule -->
+  <div class="card accent-yellow">
+    <div class="card-header">
+      <div class="card-icon">⚡</div>
+      <div class="card-title">Osborne's Rule</div>
+    </div>
+    <p>从三角恒等式快速转换为双曲恒等式的规则：</p>
+    <p style="margin:12px 0; font-size:18px; color:var(--text-bright);">sin → sinh，cos → cosh，tan → tanh</p>
+    <p style="color:var(--orange);">⚠️ 凡是涉及<strong>两个 sinh 相乘</strong>（即 sinh 的"积"）的项，要<strong>变号</strong>。</p>
+    <div class="formula-box" style="margin-top:16px;">
+      <p>例：\(\cos^2 x + \sin^2 x = 1\) → \(\cosh^2 x - \sinh^2 x = 1\)</p>
+      <p style="color:var(--text-dim);">因为 \(\sin^2 x\) 是两个 sin 的积，变号变成 \(-\sinh^2 x\)</p>
+      <p style="margin-top:8px;">例：\(\tan(A+B) = \frac{\tan A + \tan B}{1 - \tan A \tan B}\) → \(\tanh(A+B) = \frac{\tanh A + \tanh B}{1 + \tanh A \tanh B}\)</p>
+      <p style="color:var(--text-dim);">因为 \(\tan A \tan B = \frac{\sinh A}{\cosh A} \cdot \frac{\sinh B}{\cosh B}\) 含两个 sinh 的积，所以分母的负号变正号</p>
+    </div>
+  </div>
+
+  <div class="warning">
+    <div class="warning-title">Osborne's Rule 不是证明！</div>
+    <p>考试中如果要求 "prove"（证明），你必须从指数定义出发推导，不能引用 Osborne's Rule。这个规则只能在 "state"（陈述）或 "write down"（写出）类题目中使用。</p>
+  </div>
+
+  <!-- Example 1.4: Proof -->
+  <div class="example">
+    <div class="example-header" onclick="toggleExample(this)">
+      <span class="example-tag">Example 1.4</span>
+      <span class="example-q">证明 \(\cosh^2 x - \sinh^2 x \equiv 1\) <span class="tag tag-proof">PROOF</span> <span class="tag tag-freq">高频</span></span>
+      <span class="example-toggle">+</span>
+    </div>
+    <div class="example-body">
+      <div class="step">
+        <div class="step-label">LHS</div>
+        <p>$$\cosh^2 x - \sinh^2 x = \frac{(e^x + e^{-x})^2}{4} - \frac{(e^x - e^{-x})^2}{4}$$</p>
+        <p>$$= \frac{(e^x + e^{-x})^2 - (e^x - e^{-x})^2}{4}$$</p>
+        <p>利用 \(a^2 - b^2 = (a+b)(a-b)\)：</p>
+        <p>$$= \frac{(2e^x)(2e^{-x})}{4} = \frac{4e^0}{4} = \frac{4}{4} = 1 = \text{RHS}$$</p>
+      </div>
+      <div class="tip" style="margin-top:16px;">
+        <div class="tip-title">也可以直接展开</div>
+        <p>展开两个平方后相减，\(e^{2x}\) 和 \(e^{-2x}\) 项会全部消掉，只剩常数 \(\frac{4}{4} = 1\)。两种方法都可以。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example: Prove tanh 2x -->
+  <div class="example">
+    <div class="example-header" onclick="toggleExample(this)">
+      <span class="example-tag">Example 1.4(ii)</span>
+      <span class="example-q">证明 \(\tanh 2x = \frac{2\tanh x}{1 + \tanh^2 x}\) <span class="tag tag-proof">PROOF</span></span>
+      <span class="example-toggle">+</span>
+    </div>
+    <div class="example-body">
+      <div class="step">
+        <div class="step-label">从 RHS 出发</div>
+        <p>$$\text{RHS} = \frac{2 \cdot \frac{e^x + e^{-x}}{e^x - e^{-x}}}{1 + \frac{(e^x + e^{-x})^2}{(e^x - e^{-x})^2}} = \frac{\frac{2(e^x + e^{-x})}{e^x - e^{-x}}}{\frac{(e^x - e^{-x})^2 + (e^x + e^{-x})^2}{(e^x - e^{-x})^2}}$$</p>
+        <p>$$= \frac{2(e^x + e^{-x})}{e^x - e^{-x}} \cdot \frac{(e^x - e^{-x})^2}{(e^x - e^{-x})^2 + (e^x + e^{-x})^2}$$</p>
+        <p>$$= \frac{2(e^x + e^{-x})(e^x - e^{-x})}{2(e^{2x} + e^{-2x})}$$</p>
+        <p>$$= \frac{2(e^{2x} - e^{-2x})}{2(e^{2x} + e^{-2x})} = \frac{e^{2x} - e^{-2x}}{e^{2x} + e^{-2x}} = \tanh 2x = \text{LHS}$$</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!-- SECTION 4: SOLVING EQUATIONS -->
+<!-- ============================================================ -->
+<section id="equations" class="reveal">
+  <div class="section-label">04 · Solving Equations</div>
+  <div class="section-title">解双曲方程</div>
+
+  <p style="margin-bottom:24px;">解双曲方程有两种主要方法，考试可能指定使用哪一种。</p>
+
+  <div class="card accent-green">
+    <div class="card-header">
+      <div class="card-icon">A</div>
+      <div class="card-title">方法一：指数法（化成 eˣ 的二次方程）</div>
+    </div>
+    <p>把所有双曲函数用 \(e^x\) 的定义替换，乘以 \(2e^x\)（或 \(2\)）消去分母，得到关于 \(e^x\) 的二次方程，然后解之。</p>
+    <p style="margin-top:8px; color:var(--red);">注意：\(e^x > 0\)，所以 \(e^x\) 的负数解必须 reject。</p>
+  </div>
+
+  <div class="card accent-green">
+    <div class="card-header">
+      <div class="card-icon">B</div>
+      <div class="card-title">方法二：恒等式法（化成双曲函数的二次方程）</div>
+    </div>
+    <p>用恒等式统一成同一个双曲函数，然后解关于该函数的二次方程。最后用反双曲函数或对数形式求 \(x\)。</p>
+    <p style="margin-top:8px; color:var(--red);">注意 range 限制：\(\cosh x \geq 1\)，\(-1 < \tanh x < 1\)。超出范围的解必须 reject。</p>
+  </div>
+
+  <!-- Example 1.2(i): 19 sinh x + 16 cosh x = 8 -->
+  <div class="example">
+    <div class="example-header" onclick="toggleExample(this)">
+      <span class="example-tag">Example 1.2(i)</span>
+      <span class="example-q">解 \(19\sinh x + 16\cosh x = 8\) <span class="tag tag-freq">高频题型</span></span>
+      <span class="example-toggle">+</span>
+    </div>
+    <div class="example-body">
+      <div class="step">
+        <div class="step-label">代入指数定义</div>
+        <p>$$19 \cdot \frac{e^x - e^{-x}}{2} + 16 \cdot \frac{e^x + e^{-x}}{2} = 8$$</p>
+      </div>
+      <div class="step">
+        <div class="step-label">乘以 2 并整理</div>
+        <p>$$19e^x - 19e^{-x} + 16e^x + 16e^{-x} = 16$$</p>
+        <p>$$35e^x - 3e^{-x} = 16$$</p>
+      </div>
+      <div class="step">
+        <div class="step-label">乘以 eˣ 得二次方程</div>
+        <p>$$35e^{2x} - 16e^x - 3 = 0$$</p>
+        <p>$$(5e^x - 3)(7e^x + 1) = 0$$</p>
+      </div>
+      <div class="step">
+        <div class="step-label">求解</div>
+        <p>\(e^x = \frac{3}{5}\) → \(x = \ln\frac{3}{5}\)</p>
+        <p>\(e^x = -\frac{1}{7}\) → <span style="color:var(--red);">reject（\(e^x > 0\)）</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 1.2(ii): 4 cosh x - 3 sinh x = 4 (Textbook 19.2) -->
+  <div class="example">
+    <div class="example-header" onclick="toggleExample(this)">
+      <span class="example-tag">Example 19.2</span>
+      <span class="example-q">解 \(4\cosh x - 3\sinh x = 4\)（课本）</span>
+      <span class="example-toggle">+</span>
+    </div>
+    <div class="example-body">
+      <div class="step">
+        <div class="step-label">代入指数定义，乘以 2</div>
+        <p>$$4(e^x + e^{-x}) - 3(e^x - e^{-x}) = 8$$</p>
+        <p>$$4e^x + 4e^{-x} - 3e^x + 3e^{-x} = 8$$</p>
+        <p>$$e^x + 7e^{-x} = 8$$</p>
+      </div>
+      <div class="step">
+        <div class="step-label">乘以 eˣ</div>
+        <p>$$e^{2x} - 8e^x + 7 = 0$$</p>
+        <p>$$(e^x - 7)(e^x - 1) = 0$$</p>
+      </div>
+      <div class="step">
+        <div class="step-label">求解</div>
+        <p>\(x = \ln 7\) 或 \(x = \ln 1 = 0\)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 19.3: 3 tanh²x - 4 tanh x = 4 -->
+  <div class="example">
+    <div class="example-header" onclick="toggleExample(this)">
+      <span class="example-tag">Example 19.3</span>
+      <span class="example-q">解 \(3\tanh^2 x - 4\tanh x = 4\)（恒等式法）</span>
+      <span class="example-toggle">+</span>
+    </div>
+    <div class="example-body">
+      <div class="step">
+        <div class="step-label">令 T = tanh x</div>
+        <p>$$3T^2 - 4T - 4 = 0$$</p>
+        <p>$$3T^2 - 6T + 2T - 4 = 0$$</p>
+        <p>$$(T-2)(3T+2) = 0$$</p>
+      </div>
+      <div class="step">
+        <div class="step-label">判断解的有效性</div>
+        <p>\(T = 2\) → <span style="color:var(--red);">reject！因为 \(-1 < \tanh x < 1\)，不可能等于 2。</span></p>
+        <p>\(T = -\frac{2}{3}\) → 有效，\(x = \tanh^{-1}\left(-\frac{2}{3}\right) = \frac{1}{2}\ln\frac{1/3}{5/3} = \frac{1}{2}\ln\frac{1}{5}\)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 1.8: sinh²x - 5 sinh x + 4 = 0 -->
+  <div class="example">
+    <div class="example-header" onclick="toggleExample(this)">
+      <span class="example-tag">Example 1.8(i)</span>
+      <span class="example-q">解 \(\sinh^2 x - 5\sinh x + 4 = 0\)</span>
+      <span class="example-toggle">+</span>
+    </div>
+    <div class="example-body">
+      <div class="step">
+        <div class="step-label">因式分解</div>
+        <p>$$(\sinh x - 4)(\sinh x - 1) = 0$$</p>
+        <p>\(\sinh x = 4\) 或 \(\sinh x = 1\)</p>
+      </div>
+      <div class="step">
+        <div class="step-label">用反函数求解</div>
+        <p>\(x = \sinh^{-1} 4 = \ln(4 + \sqrt{17})\)</p>
+        <p>\(x = \sinh^{-1} 1 = \ln(1 + \sqrt{2})\)</p>
+      </div>
+      <div class="tip" style="margin-top:12px;">
+        <div class="tip-title">注意</div>
+        <p>sinh x 的 range 是全体实数，所以 sinh x = 4 和 sinh x = 1 都是有效的，不需要 reject。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 1.8(ii): 2 cosh 2x = 9 cosh x - 7 -->
+  <div class="example">
+    <div class="example-header" onclick="toggleExample(this)">
+      <span class="example-tag">Example 1.8(ii)</span>
+      <span class="example-q">解 \(2\cosh 2x = 9\cosh x - 7\)</span>
+      <span class="example-toggle">+</span>
+    </div>
+    <div class="example-body">
+      <div class="step">
+        <div class="step-label">用双角公式</div>
+        <p>\(\cosh 2x = 2\cosh^2 x - 1\)，代入：</p>
+        <p>$$2(2\cosh^2 x - 1) = 9\cosh x - 7$$</p>
+        <p>$$4\cosh^2 x - 9\cosh x + 5 = 0$$</p>
+      </div>
+      <div class="step">
+        <div class="step-label">因式分解</div>
+        <p>$$(4\cosh x - 5)(cosh x - 1) = 0$$</p>
+        <p>\(\cosh x = \frac{5}{4}\) 或 \(\cosh x = 1\)</p>
+      </div>
+      <div class="step">
+        <div class="step-label">求解</div>
+        <p>\(x = \cosh^{-1}\frac{5}{4} = \ln\left(\frac{5}{4} + \sqrt{\frac{25}{16} - 1}\right) = \ln 2\)</p>
+        <p>\(x = \cosh^{-1} 1 = 0\)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example: 4 cosh x - sinh x = 8 (mixed method) -->
+  <div class="example">
+    <div class="example-header" onclick="toggleExample(this)">
+      <span class="example-tag">Example 1.8(iii)</span>
+      <span class="example-q">解 \(4\cosh x - \sinh x = 8\)（要求精确对数形式）</span>
+      <span class="example-toggle">+</span>
+    </div>
+    <div class="example-body">
+      <div class="step">
+        <div class="step-label">代入指数定义</div>
+        <p>$$4 \cdot \frac{e^x + e^{-x}}{2} - \frac{e^x - e^{-x}}{2} = 8$$</p>
+        <p>$$\frac{4e^x + 4e^{-x} - e^x + e^{-x}}{2} = 8$$</p>
+        <p>$$3e^x + 5e^{-x} = 16$$</p>
+      </div>
+      <div class="step">
+        <div class="step-label">乘以 eˣ</div>
+        <p>$$3e^{2x} - 16e^x + 5 = 0$$</p>
+        <p>$$(3e^x - 1)(e^x - 5) = 0$$</p>
+      </div>
+      <div class="step">
+        <div class="step-label">求解</div>
+        <p>\(e^x = \frac{1}{3}\) → \(x = -\ln 3 = \ln\frac{1}{3}\)</p>
+        <p>\(e^x = 5\) → \(x = \ln 5\)</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!-- SECTION 5: INVERSE -->
+<!-- ============================================================ -->
+<section id="inverse" class="reveal">
+  <div class="section-label">05 · Inverse Functions</div>
+  <div class="section-title">反双曲函数与对数形式</div>
+
+  <div class="card accent-purple">
+    <div class="card-header">
+      <div class="card-icon">⁻¹</div>
+      <div class="card-title">对数形式（必须会推导！）</div>
+    </div>
+    <div class="formula-box">
+      <div class="formula-row">
+        <span class="formula-label">sinh⁻¹ x</span>
+        <span>$$\sinh^{-1} x = \ln\left(x + \sqrt{x^2 + 1}\right)$$</span>
+      </div>
+      <div class="formula-row">
+        <span class="formula-label">cosh⁻¹ x</span>
+        <span>$$\cosh^{-1} x = \ln\left(x + \sqrt{x^2 - 1}\right), \quad x \geq 1$$</span>
+      </div>
+      <div class="formula-row">
+        <span class="formula-label">tanh⁻¹ x</span>
+        <span>$$\tanh^{-1} x = \frac{1}{2}\ln\left(\frac{1 + x}{1 - x}\right), \quad |x| < 1$$</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card accent-teal">
+    <div class="card-header">
+      <div class="card-icon">📋</div>
+      <div class="card-title">其他反函数对数形式（补充）</div>
+    </div>
+    <div class="formula-box">
+      <div class="formula-row">
+        <span class="formula-label">coth⁻¹ x</span>
+        <span>$$\operatorname{coth}^{-1} x = \frac{1}{2}\ln\left(\frac{x+1}{x-1}\right)$$</span>
+      </div>
+      <div class="formula-row">
+        <span class="formula-label">sech⁻¹ x</span>
+        <span>$$\operatorname{sech}^{-1} x = \ln\left(\frac{1 + \sqrt{1 - x^2}}{x}\right)$$</span>
+      </div>
+      <div class="formula-row">
+        <span class="formula-label">cosech⁻¹ x</span>
+        <span>$$\operatorname{cosech}^{-1} x = \ln\left(\frac{1 + \sqrt{1 + x^2}}{x}\right)$$</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Proof: sinh⁻¹ x -->
+  <div class="example">
+    <div class="example-header" onclick="toggleExample(this)">
+      <span class="example-tag">Example 1.7 / 19.8</span>
+      <span class="example-q">推导 \(\sinh^{-1} x = \ln(x + \sqrt{x^2 + 1})\) <span class="tag tag-proof">PROOF</span> <span class="tag tag-freq">高频</span></span>
+      <span class="example-toggle">+</span>
+    </div>
+    <div class="example-body">
+      <div class="step">
+        <div class="step-label">设 y = sinh⁻¹ x</div>
+        <p>则 \(\sinh y = x\)，即 \(\frac{e^y - e^{-y}}{2} = x\)</p>
+      </div>
+      <div class="step">
+        <div class="step-label">化成二次方程</div>
+        <p>$$e^y - e^{-y} = 2x$$</p>
+        <p>乘以 \(e^y\)：</p>
+        <p>$$e^{2y} - 2xe^y - 1 = 0$$</p>
+      </div>
+      <div class="step">
+        <div class="step-label">用求根公式</div>
+        <p>$$e^y = \frac{2x \pm \sqrt{4x^2 + 4}}{2} = x \pm \sqrt{x^2 + 1}$$</p>
+      </div>
+      <div class="step">
+        <div class="step-label">取正根</div>
+        <p>因为 \(e^y > 0\)，而 \(\sqrt{x^2 + 1} > |x| \geq x\)，所以 \(x - \sqrt{x^2 + 1} < 0\)，必须 reject。</p>
+        <p>$$e^y = x + \sqrt{x^2 + 1}$$</p>
+        <p>$$y = \ln\left(x + \sqrt{x^2 + 1}\right)$$</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Proof: sinh⁻¹ A + sinh⁻¹ B -->
+  <div class="example">
+    <div class="example-header" onclick="toggleExample(this)">
+      <span class="example-tag">Example 1.9 / 19.10</span>
+      <span class="example-q">证明 \(\sinh^{-1} A + \sinh^{-1} B = \sinh^{-1}(A\sqrt{1+B^2} + B\sqrt{1+A^2})\) <span class="tag tag-rare">少见</span></span>
+      <span class="example-toggle">+</span>
+    </div>
+    <div class="example-body">
+      <div class="step">
+        <div class="step-label">核心思路</div>
+        <p>设 \(\sinh^{-1} A = x\)，\(\sinh^{-1} B = y\)，则 \(\sinh x = A\)，\(\sinh y = B\)。</p>
+        <p>利用 \(\cosh x = \sqrt{1 + \sinh^2 x} = \sqrt{1 + A^2}\)，类似 \(\cosh y = \sqrt{1 + B^2}\)。</p>
+      </div>
+      <div class="step">
+        <div class="step-label">用加法公式</div>
+        <p>$$\sinh(x + y) = \sinh x \cosh y + \cosh x \sinh y = A\sqrt{1 + B^2} + B\sqrt{1 + A^2}$$</p>
+        <p>$$x + y = \sinh^{-1}\left(A\sqrt{1+B^2} + B\sqrt{1+A^2}\right)$$</p>
+      </div>
+      <div class="step">
+        <div class="step-label">或用对数形式验证</div>
+        <p>展开 \(\ln(A + \sqrt{A^2+1}) + \ln(B + \sqrt{B^2+1})\)，合并为单个 ln，然后证明内部表达式相等。（提示中让你考虑 \(1 + (A\sqrt{1+B^2} + B\sqrt{1+A^2})^2\) 的展开。）</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inverse function graphs -->
+  <div class="card accent-blue">
+    <div class="card-header">
+      <div class="card-icon">📈</div>
+      <div class="card-title">反双曲函数图像性质</div>
+    </div>
+    <table class="prop-table">
+      <thead>
+        <tr>
+          <th>反函数</th>
+          <th>Domain</th>
+          <th>Range</th>
+          <th>关键特征</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>\(\sinh^{-1} x\)</td>
+          <td>\(x \in \mathbb{R}\)</td>
+          <td>\(f(x) \in \mathbb{R}\)</td>
+          <td>过原点，一对一</td>
+        </tr>
+        <tr>
+          <td>\(\cosh^{-1} x\)</td>
+          <td>\(x \geq 1\)</td>
+          <td>\(f(x) \geq 0\)</td>
+          <td>起点 (1, 0)</td>
+        </tr>
+        <tr>
+          <td>\(\tanh^{-1} x\)</td>
+          <td>\(-1 < x < 1\)</td>
+          <td>\(f(x) \in \mathbb{R}\)</td>
+          <td>垂直渐近线 \(x = \pm 1\)</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="margin-top:12px; color:var(--text-dim);">反函数图像是原函数图像关于 \(y = x\) 的对称。</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!-- SECTION 6: EXAM FOCUS -->
+<!-- ============================================================ -->
+<section id="exam-focus" class="reveal">
+  <div class="section-label">06 · Exam Focus</div>
+  <div class="section-title">考试重点分析</div>
+
+  <div class="card accent-green">
+    <div class="card-header">
+      <div class="card-icon">🔥</div>
+      <div class="card-title">高频考点</div>
+    </div>
+    <p style="margin-bottom:16px;">以下题型在 CIE FP2 真题中反复出现：</p>
+    <p><span class="tag tag-freq">高频</span> <strong>用指数定义解 \(a\cosh x + b\sinh x = c\) 型方程</strong> — 几乎每年必考</p>
+    <p style="margin-top:12px;"><span class="tag tag-freq">高频</span> <strong>证明 \(\cosh^2 x - \sinh^2 x \equiv 1\)</strong> — 基础证明题</p>
+    <p style="margin-top:12px;"><span class="tag tag-freq">高频</span> <strong>推导 \(\sinh^{-1} x\) 的对数形式</strong> — 经常作为第一问出现</p>
+    <p style="margin-top:12px;"><span class="tag tag-freq">高频</span> <strong>给定一个双曲函数值，求其他所有双曲函数值</strong></p>
+    <p style="margin-top:12px;"><span class="tag tag-freq">高频</span> <strong>画变换后的双曲函数图像</strong>（平移、拉伸、取绝对值）</p>
+  </div>
+
+  <div class="card accent-orange">
+    <div class="card-header">
+      <div class="card-icon">👁️</div>
+      <div class="card-title">冷门考点</div>
+    </div>
+    <p><span class="tag tag-rare">少见</span> <strong>证明 \(\sinh^{-1} A + \sinh^{-1} B\) 的加法公式</strong> — 难度高，偶尔出现</p>
+    <p style="margin-top:12px;"><span class="tag tag-rare">少见</span> <strong>推导 cosech⁻¹ x 的对数形式</strong> — 过程更复杂</p>
+    <p style="margin-top:12px;"><span class="tag tag-rare">少见</span> <strong>用 Osborne's Rule 陈述三倍角公式</strong>（如 \(\cosh 3x \equiv 4\cosh^3 x - 3\cosh x\)）</p>
+    <p style="margin-top:12px;"><span class="tag tag-rare">少见</span> <strong>证明 \(\tanh^{-1} A + \tanh^{-1} B \equiv \tanh^{-1}\frac{A+B}{1+AB}\)</strong></p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!-- SECTION 7: COMMON TRAPS -->
+<!-- ============================================================ -->
+<section id="traps" class="reveal">
+  <div class="section-label">07 · Common Traps</div>
+  <div class="section-title">易错点与陷阱</div>
+
+  <div class="card accent-red">
+    <div class="card-header">
+      <div class="card-icon">1</div>
+      <div class="card-title">忘记 reject 无效解</div>
+    </div>
+    <p>这是最常见的失分点。三个必须检查的约束：</p>
+    <p style="margin-top:8px;">• \(e^x > 0\) — 指数法中 \(e^x\) 不能为负数</p>
+    <p>• \(\cosh x \geq 1\) — 恒等式法中 \(\cosh x < 1\) 的解无效</p>
+    <p>• \(-1 < \tanh x < 1\) — 恒等式法中 \(|\tanh x| \geq 1\) 的解无效</p>
+  </div>
+
+  <div class="card accent-red">
+    <div class="card-header">
+      <div class="card-icon">2</div>
+      <div class="card-title">Osborne's Rule 中的变号搞错</div>
+    </div>
+    <p>只有<strong>两个 sinh 的积</strong>才变号。单独的 sinh 不变号，cosh 不变号。</p>
+    <p style="margin-top:8px;">例如：\(\sin^2 x\) 是 \(\sin x \cdot \sin x\)，两个 sin 相乘，变号 → \(-\sinh^2 x\)</p>
+    <p>但 \(\sin 2x = 2\sin x \cos x\) 只有一个 sin，不变号 → \(\sinh 2x = 2\sinh x \cosh x\)</p>
+  </div>
+
+  <div class="card accent-red">
+    <div class="card-header">
+      <div class="card-icon">3</div>
+      <div class="card-title">对数形式推导中取错根</div>
+    </div>
+    <p>推导 \(\sinh^{-1} x\) 时，求根公式给出 \(e^y = x \pm \sqrt{x^2 + 1}\)。</p>
+    <p style="margin-top:8px;">必须论证为什么取正号：因为 \(\sqrt{x^2+1} > |x|\)，所以 \(x - \sqrt{x^2+1} < 0\)，而 \(e^y > 0\)。</p>
+    <p style="margin-top:8px; color:var(--orange);">考试中不写这个论证过程会扣分！</p>
+  </div>
+
+  <div class="card accent-red">
+    <div class="card-header">
+      <div class="card-icon">4</div>
+      <div class="card-title">混淆 cosh 2x 的三种形式</div>
+    </div>
+    <p>\(\cosh 2x = \cosh^2 x + \sinh^2 x = 2\cosh^2 x - 1 = 1 + 2\sinh^2 x\)</p>
+    <p style="margin-top:8px;">选择哪一种取决于方程中已有的函数类型。如果方程含 cosh x，用 \(2\cosh^2 x - 1\)；含 sinh x，用 \(1 + 2\sinh^2 x\)。</p>
+  </div>
+
+  <div class="card accent-red">
+    <div class="card-header">
+      <div class="card-icon">5</div>
+      <div class="card-title">Proof 题中用 Osborne's Rule</div>
+    </div>
+    <p>如果题目说 "prove" 或 "show"，你<strong>必须</strong>从指数定义出发推导。直接写 "By Osborne's Rule" 拿不到分。</p>
+    <p style="margin-top:8px;">Osborne's Rule 只能用于 "state" 或 "write down" 类题目。</p>
+  </div>
+
+  <div class="card accent-red">
+    <div class="card-header">
+      <div class="card-icon">6</div>
+      <div class="card-title">求精确值时写成小数</div>
+    </div>
+    <p>题目要求 "exact form" 时，答案必须是对数形式如 \(\ln(4 + \sqrt{17})\)，不能写 2.09。</p>
+    <p style="margin-top:8px;">如果题目要求 "3 significant figures"，则需要用计算器算出近似值。</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!-- SECTION 8: DEEPER INSIGHT -->
+<!-- ============================================================ -->
+<section id="deeper" class="reveal">
+  <div class="section-label">08 · Deeper Insight</div>
+  <div class="section-title">二次洞察与举一反三</div>
+
+  <div class="insight">
+    <div class="insight-title">为什么叫"双曲"函数？</div>
+    <p>三角函数参数化单位圆 \(x^2 + y^2 = 1\)：令 \(x = \cos t, y = \sin t\)。</p>
+    <p>双曲函数参数化单位双曲线 \(x^2 - y^2 = 1\)：令 \(x = \cosh t, y = \sinh t\)。</p>
+    <p style="margin-top:8px;">验证：\(\cosh^2 t - \sinh^2 t = 1\) ✓ — 这就是核心恒等式的几何意义。</p>
+  </div>
+
+  <div class="insight">
+    <div class="insight-title">cosh x 的物理意义：悬链线 (Catenary)</div>
+    <p>一条均匀的链条在重力下自然悬挂的形状恰好是 \(y = a\cosh\frac{x}{a}\)。圣路易斯拱门（Gateway Arch）的形状就是倒置的悬链线。这不是抛物线！虽然看起来很像，但数学性质完全不同。</p>
+  </div>
+
+  <div class="insight">
+    <div class="insight-title">sech²x 与孤立子波 (Soliton)</div>
+    <p>\(y = \operatorname{sech}^2 x\) 的图形被用来建模海啸和光纤中的孤立子波 — 一种传播时不改变形状、不损失能量的特殊波。它的速度与振幅成正比，这就是海啸具有巨大破坏力的原因之一。</p>
+  </div>
+
+  <div class="insight">
+    <div class="insight-title">举一反三：从一个证明方法到多个</div>
+    <p>证明 \(\cosh^2 x - \sinh^2 x \equiv 1\) 有至少三种方法：</p>
+    <p style="margin-top:8px;"><strong>方法 1：</strong>直接展开平方，然后相减（最直接）</p>
+    <p><strong>方法 2：</strong>用 \(a^2 - b^2 = (a+b)(a-b)\)（更优雅）</p>
+    <p><strong>方法 3：</strong>用 \(e^x = \cosh x + \sinh x\) 和 \(e^{-x} = \cosh x - \sinh x\)，两者相乘得 \(e^0 = \cosh^2 x - \sinh^2 x = 1\)（最巧妙）</p>
+    <p style="margin-top:8px; color:var(--accent);">考试中选择你最熟练的方法，但了解多种方法能加深理解。</p>
+  </div>
+
+  <div class="insight">
+    <div class="insight-title">为什么 cosh⁻¹ x 的对数形式只取正根？</div>
+    <p>推导 \(\cosh^{-1} x\) 时，求根公式给出 \(e^y = x \pm \sqrt{x^2 - 1}\)。注意此时 \(x \geq 1\)。</p>
+    <p style="margin-top:8px;">\(x - \sqrt{x^2 - 1} = \frac{1}{x + \sqrt{x^2-1}}\)（有理化），所以它确实是正数。</p>
+    <p>但我们规定 \(\cosh^{-1} x \geq 0\)（因为限制了 \(y \geq 0\)），而 \(\ln(x - \sqrt{x^2-1}) < 0\)，所以取 \(e^y = x + \sqrt{x^2-1}\)。</p>
+    <p style="margin-top:8px; color:var(--text-dim);">这与 sinh⁻¹ x 的情况不同 — 那里负根确实小于零所以被 reject，而这里负根虽然是正数但给出的 y 值为负。</p>
+  </div>
+
+  <div class="card accent-purple">
+    <div class="card-header">
+      <div class="card-icon">🔗</div>
+      <div class="card-title">三角函数 vs 双曲函数 对照表</div>
+    </div>
+    <div style="overflow-x:auto;">
+    <table class="prop-table">
+      <thead>
+        <tr>
+          <th>三角 (Circular)</th>
+          <th>双曲 (Hyperbolic)</th>
+          <th>注意差异</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>\(\cos^2 x + \sin^2 x = 1\)</td>
+          <td>\(\cosh^2 x - \sinh^2 x = 1\)</td>
+          <td>符号变化</td>
+        </tr>
+        <tr>
+          <td>\(1 + \tan^2 x = \sec^2 x\)</td>
+          <td>\(1 - \tanh^2 x = \operatorname{sech}^2 x\)</td>
+          <td>符号变化</td>
+        </tr>
+        <tr>
+          <td>\(\sin 2x = 2\sin x \cos x\)</td>
+          <td>\(\sinh 2x = 2\sinh x \cosh x\)</td>
+          <td>完全相同</td>
+        </tr>
+        <tr>
+          <td>\(\cos 2x = \cos^2 x - \sin^2 x\)</td>
+          <td>\(\cosh 2x = \cosh^2 x + \sinh^2 x\)</td>
+          <td>符号变化</td>
+        </tr>
+        <tr>
+          <td>\(\sin(A+B) = \sin A\cos B + \cos A\sin B\)</td>
+          <td>\(\sinh(A+B) = \sinh A\cosh B + \cosh A\sinh B\)</td>
+          <td>完全相同</td>
+        </tr>
+        <tr>
+          <td>\(\cos(A+B) = \cos A\cos B - \sin A\sin B\)</td>
+          <td>\(\cosh(A+B) = \cosh A\cosh B + \sinh A\sinh B\)</td>
+          <td>符号变化</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!-- SECTION: HOMEWORK -->
+<!-- ============================================================ -->
+<section id="homework" class="reveal">
+  <div class="section-label">09 · Homework</div>
+  <div class="section-title">课后练习</div>
+
+  <p style="margin-bottom:24px; color:var(--text-dim);">以下是讲义和课本中的练习题（用于自测和追踪错题）。</p>
+
+  <div class="card accent-blue">
+    <div class="card-header">
+      <div class="card-icon">📝</div>
+      <div class="card-title">Question 1.1（讲义）</div>
+    </div>
+    <p>Write all solutions in exact form.</p>
+    <p style="margin-top:12px;">1. Solve \(29\cosh x = 11\sinh x + 27\)</p>
+    <p>2. Solve \(17\sinh x + 16\cosh x = 8\)</p>
+    <p>3. Solve \(\operatorname{cosech} x - 2\operatorname{coth} x = 2\)</p>
+    <p>4. Sketch \(y = |3\cosh x - 5|\)</p>
+    <p>5. Sketch \(y = 4 - \operatorname{cosech}(x - 2)\)</p>
+    <p>6. Sketch \(y = \left|2 + \frac{1}{2}\operatorname{coth}(x + 1)\right|\)</p>
+    <p>7. Solve \(4\cosh x + \sinh x = 8\)，答案写成 \(b\ln a\) 的形式</p>
+    <p>8. Solve \(10\cosh x + 2\sinh x = 11\)，答案写成 \(\ln a\) 的形式</p>
+  </div>
+
+  <div class="card accent-teal">
+    <div class="card-header">
+      <div class="card-icon">📝</div>
+      <div class="card-title">Exercise 19A（课本）</div>
+    </div>
+    <p>1. Solve \(19\sinh x + 16\cosh x = 8\)</p>
+    <p>2. Solve \(29\cosh x = 11\sinh x + 27\)</p>
+    <p>3. Solve \(17\sinh x + 16\cosh x = 8\)</p>
+    <p>4. Solve \(7 = 17\tanh x + 28\operatorname{sech} x\)</p>
+    <p>5. Solve \(\operatorname{cosech} x - 2\operatorname{coth} x = 2\)</p>
+    <p>6–8. Graph sketching problems</p>
+    <p>9. Solve \(4\cosh x + \sinh x = 8\)（答案为 \(b\ln a\)）</p>
+    <p>10. Solve \(10\cosh x + 2\sinh x = 11\)（答案为 \(\ln a\)）</p>
+    <p>11. Given \(\operatorname{sech}^{-1} x = \ln\frac{1+\sqrt{1-x^2}}{x}\)，solve \(4\operatorname{sech} x - 3\tanh^2 x = 1\)</p>
+  </div>
+
+  <div class="card accent-purple">
+    <div class="card-header">
+      <div class="card-icon">📝</div>
+      <div class="card-title">Exercise 19B & 19C（课本 — 恒等式 & 反函数）</div>
+    </div>
+    <p><strong>19B:</strong></p>
+    <p>1. Prove \(\cosh^2 x \equiv \frac{\operatorname{cosech}^2 x + 1}{\operatorname{coth}^2 x - 1}\)</p>
+    <p>2. Prove \(\cosh 3x \equiv 4\cosh^3 x - 3\cosh x\)</p>
+    <p>3. Prove \(\operatorname{coth} 2x - \operatorname{coth} x \equiv \frac{1}{2}(\tanh x - \operatorname{coth} x)\)</p>
+    <p>5. Given \(\tanh\frac{x}{2} = t\)，prove \(\sinh x = \frac{2t}{1-t^2}\)</p>
+    <p style="margin-top:16px;"><strong>19C:</strong></p>
+    <p>3. Prove \(\cosh^{-1} x \equiv \ln(x + \sqrt{x^2 - 1})\)</p>
+    <p>4. Prove \(\tanh^{-1} x \equiv \frac{1}{2}\ln\frac{1+x}{1-x}\)</p>
+    <p>5. Prove \(\operatorname{sech}^{-1} x \equiv \ln\frac{1+\sqrt{1-x^2}}{x}\)</p>
+    <p>6. Prove \(\tanh^{-1} A + \tanh^{-1} B \equiv \tanh^{-1}\frac{A+B}{1+AB}\)</p>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer style="text-align:center; padding:40px 0; color:var(--text-dim); font-size:13px; font-family:'JetBrains Mono', monospace;">
+  CIE FP2 Revision · Hyperbolic Functions · Built for learning
+</footer>
+
+</div><!-- end container -->
+
+<!-- Back to top -->
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// Toggle examples
+function toggleExample(header) {
+  header.parentElement.classList.toggle('open');
+}
+
+// Scroll reveal
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.1 });
+reveals.forEach(r => observer.observe(r));
+
+// Side nav active state
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.side-nav a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 200) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+  // Back to top
+  document.getElementById('backTop').classList.toggle('show', window.scrollY > 600);
+});
+
+// KaTeX render
+document.addEventListener('DOMContentLoaded', () => {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '\\(', right: '\\)', display: false}
+    ],
+    throwOnError: false
+  });
+});
+</script>
+</body>
+</html>
